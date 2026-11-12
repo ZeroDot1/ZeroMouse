@@ -3,6 +3,7 @@ src/
 __pycache__/
 *.log
 dist/
+windows/cursors/
 *.pkg.tar.zst
 *.deb
 *.rpm

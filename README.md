@@ -24,16 +24,16 @@ sizes.
 Color and size can be adjusted in supported desktop environments. Visibility
 depends on the display, scaling, background, and each person's vision.
 
-## Linux support and packages
+## Linux and Windows support
 
 The theme uses the widely supported XCursor format. Cursor files contain
 multiple resolutions; files in `zeromouse/cursors/` use cursor role names such
 as `left_ptr` and `watch` without extensions. PNG and GIF files in `preview/`
 are separate image previews.
 
-The **Build Linux packages** workflow can be started manually from GitHub
-Actions. Before packaging, it validates file headers, all ten sizes, hotspots,
-animation frames, and alias targets. It produces:
+The **Build Linux and Windows packages** workflow can be started manually from
+GitHub Actions. It validates XCursor headers, image sizes, hotspots, animation
+frames, aliases, and the Windows CUR/ANI output. It produces:
 
 | Linux family | Package |
 | --- | --- |
@@ -41,18 +41,21 @@ animation frames, and alias targets. It produces:
 | Debian and Ubuntu | `.deb` |
 | Fedora and RPM-based systems | `.rpm` |
 | Other Linux distributions | portable XCursor `.tar.gz` archive |
+| Windows 10 and 11 | per-user installer `.exe` |
 
 Wayland support depends on the desktop environment and compositor. KDE Plasma
 and other XCursor-compatible environments can select the theme directly.
 
 ## Build packages on GitHub
 
-1. Open the repository and choose **Actions → Build Linux packages → Run
-   workflow**.
-2. The run builds all four packages, calculates SHA-256 checksums, and makes a
-   combined bundle available under **Artifacts**.
-3. Optionally enable **Create a GitHub Release** to attach the packages to a
-   release tagged `v<VERSION>`. Existing tags are never overwritten.
+1. Open the repository and choose **Actions → Build Linux and Windows packages
+   → Run workflow**.
+2. The run builds Linux packages and the Windows installer, calculates SHA-256
+   checksums, and makes a combined bundle available under **Artifacts**.
+3. **Create a versioned GitHub Release** is enabled by default. Leave it enabled
+   to publish all packages under the tag `v<VERSION>`; disable it to build
+   downloadable workflow artifacts without publishing a release. Existing
+   releases and tags are never overwritten.
 
 [VERSION](VERSION) is the single source for the project version. Update it
 before a release and reset Arch's `pkgrel` in `PKGBUILD` to `1`. Increase only
@@ -74,6 +77,25 @@ sudo pacman -U "$(makepkg --packagelist | tail -n 1)"
 Then open **System Settings → Colors & Themes → Cursors**, select **ZeroMouse
 Neon Launch**, and choose a size. Uninstall with `./uninstall.sh`.
 
+## Windows 10 and 11
+
+Download and run `ZeroMouse-Setup-<version>.exe` from the GitHub Release. The
+installer works for the current user and does not require administrator rights.
+It applies the pointer, text, hand, help, move, resize, crosshair, forbidden,
+pen, and zoom cursors; the animated hourglass is used while Windows is busy and
+the animated rocket is used while an application starts. The uninstaller
+restores the cursor settings that were active before installation.
+
+Windows `.cur` and `.ani` files store dimensions in one-byte fields, where the
+largest representable image size is 256 × 256 pixels. The Windows theme
+therefore includes the same artwork at 24, 32, 36, 48, 64, 72, 96, 128, and 256
+pixels. Windows 10 and 11 can adjust the displayed pointer size under
+**Settings → Accessibility → Mouse pointer and touch**; 512-pixel XCursor images
+remain available on Linux.
+
+The installer is not code-signed. Windows may show its standard publisher
+warning before installation.
+
 ## Debian, Fedora, and other systems
 
 Install a `.deb` with `sudo apt install ./zeromouse-cursor-theme_*.deb` or an RPM
@@ -86,9 +108,11 @@ to `/usr/share/icons/ZeroMouse`; for a user-only install, copy it to
 
 ## Development and license
 
-All package builders read `VERSION`. `build.py` creates XCursor files and
-`preview.py` renders the README previews; both require Python 3 and the
-dependencies in [requirements.txt](requirements.txt).
+All package builders read `VERSION`. `build.py` creates XCursor files;
+`windows/build-windows-cursors.py` creates Windows `.cur` and `.ani` files from
+the same artwork. Both require Python 3 and the dependencies in
+[requirements.txt](requirements.txt). The Windows installer is compiled with
+Inno Setup on a Windows runner.
 
 Licensed under the **GNU Affero General Public License v3.0 or later**
 (AGPL-3.0-or-later). See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md).

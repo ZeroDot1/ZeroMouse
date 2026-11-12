@@ -1,6 +1,6 @@
 pkgname=zeromouse-cursor-theme
 pkgver="$(tr -d '\r\n' < "$startdir/VERSION")"
-pkgrel=6
+pkgrel=1
 pkgdesc='High-visibility neon XCursor theme for people with low vision'
 arch=('any')
 license=('AGPL-3.0-or-later')

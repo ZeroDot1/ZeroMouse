@@ -17,9 +17,14 @@ diagnosis information is not needed.
   animations, and alias targets.
 - `python3 -m pip install -r requirements.txt` installs Pillow for artwork
   rendering and preview generation.
+- `python windows/build-windows-cursors.py` generates the multi-resolution
+  Windows `.cur` and animated `.ani` files.
+- `python windows/validate-windows-cursors.py` validates their image sizes,
+  hotspots, RIFF structure, frames, and timing.
 - On Arch Linux, `makepkg -f` builds the pacman package.
-- The **Build Linux packages** workflow validates and builds packages for
-  Arch, Debian/Ubuntu, Fedora, and other Linux distributions.
+- The **Build Linux and Windows packages** workflow validates and builds
+  packages for Arch, Debian/Ubuntu, Fedora, other Linux distributions, and
+  Windows.
 
 Use `VERSION` as the single source for the project version. When changing the
 Arch package without a new project version, increase `pkgrel` in `PKGBUILD`. For

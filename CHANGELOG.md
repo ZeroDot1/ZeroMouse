@@ -1,6 +1,16 @@
 
 # Changelog
 
+## 1.0.5
+
+- Added multi-resolution Windows cursor files generated from the same artwork
+  as the Linux XCursor theme.
+- Added animated Windows hourglass and rocket cursors, plus a per-user installer
+  that applies the Windows cursor scheme and restores the previous settings on
+  uninstall.
+- Extended the GitHub Actions package and release workflow to include a Windows
+  installer.
+
 ## 1.0.0
 
 - Initial public-ready release of the accessibility-focused ZeroMouse XCursor
