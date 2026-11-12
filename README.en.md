@@ -18,6 +18,8 @@ sizes.
 - Distinct symbols for pointer, text, hand, move, resize, help, zoom, forbidden,
   and other common cursor roles.
 - An animated hourglass for waiting and a rocket for progress feedback.
+- Each cursor size is rendered independently with antialiased edges, instead of
+  enlarging a small bitmap.
 
 Color and size can be adjusted in supported desktop environments. Visibility
 depends on the display, scaling, background, and each person's vision.
@@ -30,7 +32,8 @@ as `left_ptr` and `watch` without extensions. PNG and GIF files in `preview/`
 are separate image previews.
 
 The **Build Linux packages** workflow can be started manually from GitHub
-Actions. It produces:
+Actions. Before packaging, it validates file headers, all ten sizes, hotspots,
+animation frames, and alias targets. It produces:
 
 | Linux family | Package |
 | --- | --- |
@@ -84,7 +87,8 @@ to `/usr/share/icons/ZeroMouse`; for a user-only install, copy it to
 ## Development and license
 
 All package builders read `VERSION`. `build.py` creates XCursor files and
-`preview.py` renders the README previews; both require Python 3 and Pillow.
+`preview.py` renders the README previews; both require Python 3 and the
+dependencies in [requirements.txt](requirements.txt).
 
 Licensed under the **GNU Affero General Public License v3.0 or later**
 (AGPL-3.0-or-later). See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md).

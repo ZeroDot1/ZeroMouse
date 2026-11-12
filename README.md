@@ -18,6 +18,8 @@ gut unterscheidbare Formen und große Cursorgrößen.
 - Eigenständige Symbole für Zeiger, Text, Hand, Verschieben, Größenänderung,
   Hilfe, Zoom, Verbot und weitere häufige Cursorrollen.
 - Animierte Sanduhr für Wartezeiten und Rakete als Fortschrittsanzeige.
+- Jede Cursorgröße wird separat mit geglätteten Kanten gerendert, statt kleine
+  Cursorbilder nur hochzuskalieren.
 
 Farbe und Größe lassen sich in unterstützten Desktopumgebungen anpassen. Die
 Wahrnehmbarkeit hängt von Bildschirm, Skalierung, Hintergrund und individuellen
@@ -31,7 +33,8 @@ heißen deshalb wie die Cursorrollen (`left_ptr`, `watch` usw.) und haben keine
 Dateiendung. PNG und GIF in `preview/` sind separate Vorschaudateien.
 
 Der Workflow **Build Linux packages** baut auf manuelle Anforderung in GitHub
-Actions folgende Downloads:
+Actions folgende Downloads. Vor dem Paketbau prüft er Dateiköpfe, alle zehn
+Auflösungen, Hotspots, Animationsframes und Alias-Ziele:
 
 | Systemfamilie | Paket |
 | --- | --- |
@@ -93,7 +96,7 @@ Benutzerinstallation nach `~/.local/share/icons/ZeroMouse`.
 
 `VERSION` wird von allen Paketbauern gelesen. `build.py` erzeugt die XCursor-
 Dateien; `preview.py` rendert die README-Vorschauen. Beide benötigen Python 3
-und Pillow.
+und die Abhängigkeiten aus [requirements.txt](requirements.txt).
 
 Das Projekt steht unter **GNU Affero General Public License v3.0 or later**
 (AGPL-3.0-or-later). Siehe [LICENSE](LICENSE) und [CONTRIBUTING.md](CONTRIBUTING.md).

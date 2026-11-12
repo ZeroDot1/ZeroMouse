@@ -13,8 +13,23 @@ permissions:
   contents: read
 
 jobs:
+  validate-cursors:
+    name: Validate cursor artwork and aliases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Rebuild and validate XCursor data
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/zeromouse-venv"
+          "$RUNNER_TEMP/zeromouse-venv/bin/pip" install -r requirements.txt
+          "$RUNNER_TEMP/zeromouse-venv/bin/python" build.py
+          git diff --exit-code -- zeromouse/cursors
+          "$RUNNER_TEMP/zeromouse-venv/bin/python" scripts/validate-xcursor.py
+
   build-arch:
     name: Arch Linux / CachyOS (pacman)
+    needs: [validate-cursors]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -46,6 +61,7 @@ jobs:
 
   build-debian:
     name: Debian / Ubuntu (.deb)
+    needs: [validate-cursors]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -59,6 +75,7 @@ jobs:
 
   build-fedora:
     name: Fedora / RPM (.rpm)
+    needs: [validate-cursors]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -82,6 +99,7 @@ jobs:
 
   build-universal:
     name: Universal Linux archive
+    needs: [validate-cursors]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
