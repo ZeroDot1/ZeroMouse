@@ -1,44 +1,26 @@
-# Mitwirken / Contributing
+# Contributing
 
 ZeroMouse is an accessibility-focused cursor theme. Contributions that improve
 legibility, cursor-role coverage, KDE behavior, and compatibility are welcome.
 
-## Fehler melden
+## Reporting issues
 
-Bitte beschreibe Betriebssystem und Version, Desktopumgebung, X11 oder Wayland,
-Skalierungsfaktor, ausgewählte Cursorgröße, betroffene Cursorrolle und die
-Schritte zum Nachstellen. Ein Screenshot kann helfen. Persönliche Gesundheits-
-oder Diagnosedaten sind nicht nötig.
+Please include the operating system and version, desktop environment, X11 or
+Wayland session, display scaling, selected cursor size, affected cursor role,
+and steps to reproduce the issue. A screenshot can help. Personal health or
+diagnosis information is not needed.
 
-## Änderungen testen
+## Validating changes
 
-- `python3 build.py` regeneriert die XCursor-Dateien.
-- `python3 preview.py` aktualisiert PNG- und GIF-Vorschauen.
-- `python3 scripts/validate-xcursor.py` prüft Header, Größen, Hotspots,
-  Animationen und Alias-Ziele.
-- `python3 -m pip install -r requirements.txt` installiert Pillow für den
-  Bildaufbau und die Vorschauen.
-- Auf Arch Linux: `makepkg -f` baut das pacman-Paket.
-- Der Workflow **Build Linux packages** prüft die Paketformate für Arch,
-  Debian/Ubuntu, Fedora und ein portables Linux-Archiv. Vorher rendert und
-  validiert er alle Cursor neu.
+- `python3 build.py` regenerates the XCursor files.
+- `python3 scripts/validate-xcursor.py` checks headers, sizes, hotspots,
+  animations, and alias targets.
+- `python3 -m pip install -r requirements.txt` installs Pillow for artwork
+  rendering and preview generation.
+- On Arch Linux, `makepkg -f` builds the pacman package.
+- The **Build Linux packages** workflow validates and builds packages for
+  Arch, Debian/Ubuntu, Fedora, and other Linux distributions.
 
-Bitte behalte `VERSION` als einzige Quelle der Projektversion. Wenn sich das
-Arch-Paket ohne neue Projektversion ändert, erhöhe zusätzlich `pkgrel` in
-`PKGBUILD`. Bei einer neuen Projektversion setze `pkgrel` auf `1` zurück.
-
-## Contributing in English
-
-ZeroMouse is an accessibility-focused cursor theme. Bug reports should include
-the OS and version, desktop environment, X11 or Wayland, display scaling,
-selected cursor size, affected cursor role, and reproduction steps. A screenshot
-can help. Please do not include personal health or diagnosis information.
-
-Run `python3 build.py` and `python3 preview.py` after artwork changes. On Arch,
-`python3 scripts/validate-xcursor.py` checks the XCursor files. `makepkg -f`
-builds the pacman package. The manually triggered GitHub Actions
-workflow builds the Arch, Debian/Ubuntu, Fedora, and portable Linux artifacts.
-Install the preview-generation dependency with `python3 -m pip install -r requirements.txt`.
-Use `VERSION` as the single project version source; increase Arch `pkgrel` when
-the PKGBUILD changes without a project version bump. Reset `pkgrel` to `1` for
-a new project version.
+Use `VERSION` as the single source for the project version. When changing the
+Arch package without a new project version, increase `pkgrel` in `PKGBUILD`. For
+a new project version, reset `pkgrel` to `1`.

@@ -1,102 +1,94 @@
 # ZeroMouse Neon Launch
 
-**Ein kontrastreiches XCursor-Thema für Menschen mit Sehbehinderungen und
-schlechtem Sehvermögen.** Das Design entstand aus eigener Alltagserfahrung mit
-Sehbehinderung und setzt auf leuchtendes Neongrün bis Gelbgrün, dunkle Konturen,
-gut unterscheidbare Formen und große Cursorgrößen.
+**A high-visibility XCursor theme for people with visual impairments and low
+vision.** Designed from lived experience with visual impairment, it uses neon
+lime to yellow-green artwork, dark outlines, distinct shapes, and large cursor
+sizes.
 
-![Vorschau des ZeroMouse-Themas](preview/zeromouse-preview.png)
+![ZeroMouse theme preview](preview/zeromouse-preview.png)
 
-[Sanduhr-Animation](preview/hourglass-animation.gif) · [Raketenstart-Animation](preview/rocket-animation.gif) · [English README](README.en.md)
+[Hourglass animation](preview/hourglass-animation.gif) · [Rocket launch animation](preview/rocket-animation.gif)
 
-## Barrierearme Merkmale
+## Accessibility features
 
-- Zehn Cursorgrößen von 24 bis 512 Pixel, einschließlich 36 und 72 Pixel für
-  gängige KDE-Größen.
-- Helle, gelbgrüne Flächen mit dunkler Kontur zur Abgrenzung vor hellen und
-  dunklen Oberflächen.
-- Eigenständige Symbole für Zeiger, Text, Hand, Verschieben, Größenänderung,
-  Hilfe, Zoom, Verbot und weitere häufige Cursorrollen.
-- Animierte Sanduhr für Wartezeiten und Rakete als Fortschrittsanzeige.
-- Jede Cursorgröße wird separat mit geglätteten Kanten gerendert, statt kleine
-  Cursorbilder nur hochzuskalieren.
+- Ten cursor sizes from 24 to 512 pixels, including 36 and 72 pixels for common
+  KDE size choices.
+- Bright yellow-green fills with dark outlines for visibility on light and dark
+  surfaces.
+- Distinct symbols for pointer, text, hand, move, resize, help, zoom, forbidden,
+  and other common cursor roles.
+- An animated hourglass for waiting and a rocket for progress feedback.
+- Each cursor size is rendered independently with antialiased edges, instead of
+  enlarging a small bitmap.
 
-Farbe und Größe lassen sich in unterstützten Desktopumgebungen anpassen. Die
-Wahrnehmbarkeit hängt von Bildschirm, Skalierung, Hintergrund und individuellen
-Sehbedürfnissen ab.
+Color and size can be adjusted in supported desktop environments. Visibility
+depends on the display, scaling, background, and each person's vision.
 
-## Linux-Unterstützung und Pakete
+## Linux support and packages
 
-Das Thema verwendet das verbreitete XCursor-Format. Die Cursorbilder enthalten
-mehrere Auflösungen in einer Datei; die Dateien unter `zeromouse/cursors/`
-heißen deshalb wie die Cursorrollen (`left_ptr`, `watch` usw.) und haben keine
-Dateiendung. PNG und GIF in `preview/` sind separate Vorschaudateien.
+The theme uses the widely supported XCursor format. Cursor files contain
+multiple resolutions; files in `zeromouse/cursors/` use cursor role names such
+as `left_ptr` and `watch` without extensions. PNG and GIF files in `preview/`
+are separate image previews.
 
-Der Workflow **Build Linux packages** baut auf manuelle Anforderung in GitHub
-Actions folgende Downloads. Vor dem Paketbau prüft er Dateiköpfe, alle zehn
-Auflösungen, Hotspots, Animationsframes und Alias-Ziele:
+The **Build Linux packages** workflow can be started manually from GitHub
+Actions. Before packaging, it validates file headers, all ten sizes, hotspots,
+animation frames, and alias targets. It produces:
 
-| Systemfamilie | Paket |
+| Linux family | Package |
 | --- | --- |
-| Arch Linux, CachyOS und andere Arch-basierte Systeme | pacman `.pkg.tar.zst` |
-| Debian und Ubuntu | `.deb` |
-| Fedora und RPM-basierte Systeme | `.rpm` |
-| Andere Linux-Distributionen | portables XCursor-Archiv `.tar.gz` |
+| Arch Linux, CachyOS, and Arch-based systems | pacman `.pkg.tar.zst` |
+| Debian and Ubuntu | `.deb` |
+| Fedora and RPM-based systems | `.rpm` |
+| Other Linux distributions | portable XCursor `.tar.gz` archive |
 
-Wayland-Unterstützung hängt von Desktopumgebung und Compositor ab. KDE Plasma
-und andere XCursor-kompatible Umgebungen können das Thema direkt auswählen.
+Wayland support depends on the desktop environment and compositor. KDE Plasma
+and other XCursor-compatible environments can select the theme directly.
 
-## Pakete über GitHub bauen
+## Build packages on GitHub
 
-1. Repository auf GitHub öffnen und **Actions → Build Linux packages → Run
-   workflow** wählen.
-2. Der Lauf erstellt alle vier Pakete, SHA-256-Prüfsummen und stellt ein
-   gemeinsames Bundle unter **Artifacts** zum Download bereit.
-3. Optional **Create a GitHub Release** auswählen. Dann werden die Artefakte an
-   ein Release mit dem Tag `v<VERSION>` angehängt. Ein bereits vorhandenes Tag
-   wird nicht überschrieben.
+1. Open the repository and choose **Actions → Build Linux packages → Run
+   workflow**.
+2. The run builds all four packages, calculates SHA-256 checksums, and makes a
+   combined bundle available under **Artifacts**.
+3. Optionally enable **Create a GitHub Release** to attach the packages to a
+   release tagged `v<VERSION>`. Existing tags are never overwritten.
 
-Die einzige Quelle der Projektversion ist [VERSION](VERSION). Vor einer
-Veröffentlichung diese Datei aktualisieren und `pkgrel` in `PKGBUILD` auf `1`
-zurücksetzen. Bei Änderungen am Arch-Paket ohne neue Projektversion wird nur
-`pkgrel` erhöht.
+[VERSION](VERSION) is the single source for the project version. Update it
+before a release and reset Arch's `pkgrel` in `PKGBUILD` to `1`. Increase only
+`pkgrel` for Arch package changes that do not change the project version.
 
-## Arch Linux installieren
+## Install on Arch Linux
 
 ```sh
 ./install.sh
 ```
 
-Oder selbst bauen und installieren:
+Or build and install manually:
 
 ```sh
 makepkg -f
 sudo pacman -U "$(makepkg --packagelist | tail -n 1)"
 ```
 
-Danach in KDE **Systemeinstellungen → Farben & Designs → Cursor** öffnen,
-**ZeroMouse Neon Launch** auswählen und die gewünschte Größe einstellen.
-Entfernen:
+Then open **System Settings → Colors & Themes → Cursors**, select **ZeroMouse
+Neon Launch**, and choose a size. Uninstall with `./uninstall.sh`.
 
-```sh
-./uninstall.sh
-```
+## Debian, Fedora, and other systems
 
-## Debian, Fedora und andere Systeme
+Install a `.deb` with `sudo apt install ./zeromouse-cursor-theme_*.deb` or an RPM
+with `sudo dnf install --nogpgcheck ./zeromouse-cursor-theme-*.rpm`. The
+published RPM is unsigned; verify its SHA-256 checksum from `SHA256SUMS` before
+installing. The portable archive
+contains the theme and instructions. For a system-wide install, copy `zeromouse`
+to `/usr/share/icons/ZeroMouse`; for a user-only install, copy it to
+`~/.local/share/icons/ZeroMouse`.
 
-Das `.deb` lässt sich mit `sudo apt install ./zeromouse-cursor-theme_*.deb`, das
-RPM mit `sudo dnf install --nogpgcheck ./zeromouse-cursor-theme-*.rpm`
-installieren. Das veröffentlichte RPM ist nicht signiert; vergleiche vor der
-Installation die SHA-256-Prüfsumme aus `SHA256SUMS`. Das portable Archiv enthält
-Thema und Anleitung; für eine systemweite Installation
-den Ordner `zeromouse` nach `/usr/share/icons/ZeroMouse` kopieren, für eine
-Benutzerinstallation nach `~/.local/share/icons/ZeroMouse`.
+## Development and license
 
-## Entwickeln und Lizenz
+All package builders read `VERSION`. `build.py` creates XCursor files and
+`preview.py` renders the README previews; both require Python 3 and the
+dependencies in [requirements.txt](requirements.txt).
 
-`VERSION` wird von allen Paketbauern gelesen. `build.py` erzeugt die XCursor-
-Dateien; `preview.py` rendert die README-Vorschauen. Beide benötigen Python 3
-und die Abhängigkeiten aus [requirements.txt](requirements.txt).
-
-Das Projekt steht unter **GNU Affero General Public License v3.0 or later**
-(AGPL-3.0-or-later). Siehe [LICENSE](LICENSE) und [CONTRIBUTING.md](CONTRIBUTING.md).
+Licensed under the **GNU Affero General Public License v3.0 or later**
+(AGPL-3.0-or-later). See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md).
