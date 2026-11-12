@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a cursor, sizing, visibility, or packaging problem
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Please include technical details that help reproduce the issue. You do
+        not need to share personal health or diagnosis information.
+  - type: input
+    id: os
+    attributes:
+      label: Linux distribution and version
+      placeholder: Arch Linux, Fedora 43, Ubuntu 26.04
+    validations:
+      required: true
+  - type: input
+    id: desktop
+    attributes:
+      label: Desktop environment and version
+      placeholder: KDE Plasma 6.x, GNOME 49
+    validations:
+      required: true
+  - type: dropdown
+    id: session
+    attributes:
+      label: Display session
+      options:
+        - Wayland
+        - X11
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: scaling
+    attributes:
+      label: Display scaling
+      placeholder: 100%, 150%, or mixed-DPI displays
+  - type: dropdown
+    id: cursor_size
+    attributes:
+      label: Selected cursor size
+      options:
+        - "24"
+        - "32"
+        - "36"
+        - "48"
+        - "64"
+        - "72"
+        - "96"
+        - "128"
+        - "256"
+        - "512"
+        - Other / unavailable
+  - type: input
+    id: cursor_role
+    attributes:
+      label: Affected cursor role
+      placeholder: left_ptr, watch, progress, ew-resize
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include what you expected and what happened instead.
+    validations:
+      required: true

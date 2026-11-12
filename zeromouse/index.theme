@@ -1,0 +1,5 @@
+[Icon Theme]
+Name=ZeroMouse Neon Launch
+Comment=Neon lime XCursor theme with an animated hourglass and launch rocket
+Inherits=Adwaita
+Example=left_ptr

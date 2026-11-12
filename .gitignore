@@ -1,0 +1,10 @@
+pkg/
+src/
+__pycache__/
+*.log
+dist/
+*.pkg.tar.zst
+*.deb
+*.rpm
+*.apk
+*.tar.gz

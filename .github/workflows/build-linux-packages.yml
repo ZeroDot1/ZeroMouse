@@ -1,0 +1,143 @@
+name: Build Linux packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Create a GitHub Release from these packages
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build-arch:
+    name: Arch Linux / CachyOS (pacman)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build pacman package in Arch Linux
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          docker run --rm \
+            -e HOST_UID="$(id -u)" \
+            -e HOST_GID="$(id -g)" \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -w /work \
+            archlinux:base-devel bash -euo pipefail -c '
+              pacman -Syu --noconfirm --needed base-devel
+              if ! getent group "$HOST_GID" >/dev/null; then
+                groupadd -g "$HOST_GID" builder
+              fi
+              useradd --no-create-home --uid "$HOST_UID" --gid "$HOST_GID" builder
+              install -d -o "$HOST_UID" -g "$HOST_GID" /tmp/buildhome /work/dist
+              runuser -u builder -- bash -c "cd /work && HOME=/tmp/buildhome makepkg --noconfirm --cleanbuild --force"
+              cp /work/zeromouse-cursor-theme-*-any.pkg.tar.zst /work/dist/
+            '
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package-arch
+          path: dist/*.pkg.tar.zst
+          if-no-files-found: error
+
+  build-debian:
+    name: Debian / Ubuntu (.deb)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build Debian package
+        run: bash packaging/build-deb.sh dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package-debian
+          path: dist/*.deb
+          if-no-files-found: error
+
+  build-fedora:
+    name: Fedora / RPM (.rpm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build RPM in Fedora
+        run: |
+          set -euo pipefail
+          mkdir -p dist "$RUNNER_TEMP/zeromouse-rpm-dist"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src:ro" \
+            -v "$RUNNER_TEMP/zeromouse-rpm-dist:/out" \
+            fedora:latest bash -euo pipefail -c '
+              dnf -y install rpm-build tar gzip
+              /src/packaging/build-rpm.sh /out
+            '
+          cp "$RUNNER_TEMP/zeromouse-rpm-dist/"*.rpm dist/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package-fedora
+          path: dist/*.rpm
+          if-no-files-found: error
+
+  build-universal:
+    name: Universal Linux archive
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build portable XCursor archive
+        run: bash packaging/build-universal.sh dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: package-universal
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  collect-artifacts:
+    name: Collect packages and checksums
+    needs: [build-arch, build-debian, build-fedora, build-universal]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Create SHA-256 manifest
+        run: |
+          set -euo pipefail
+          test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 4
+          (cd dist && sha256sum * > SHA256SUMS)
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux-packages
+          path: dist/*
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish optional GitHub Release
+    if: ${{ inputs.publish_release }}
+    needs: [collect-artifacts]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v7
+        with:
+          name: linux-packages
+          path: dist
+      - name: Create versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          tag="v${version}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; refusing to replace it." >&2
+            exit 1
+          fi
+          gh release create "$tag" dist/* \
+            --target "$GITHUB_SHA" \
+            --title "ZeroMouse ${version}" \
+            --generate-notes
