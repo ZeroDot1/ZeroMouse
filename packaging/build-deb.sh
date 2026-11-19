@@ -21,7 +21,6 @@ Section: x11
 Priority: optional
 Architecture: all
 Maintainer: ZeroMouse contributors <zeromouse@users.noreply.github.com>
-Suggests: adwaita-icon-theme
 Description: High-visibility neon XCursor theme for people with low vision
  Neon lime and yellow-green cursor artwork, including animated busy and
  launch feedback cursors. Supports cursor images from 24 through 512 pixels.

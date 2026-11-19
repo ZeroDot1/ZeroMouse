@@ -1,11 +1,10 @@
 pkgname=zeromouse-cursor-theme
 pkgver="$(tr -d '\r\n' < "$startdir/VERSION")"
-pkgrel=1
+pkgrel=2
 pkgdesc='High-visibility neon XCursor theme for people with low vision'
 arch=('any')
 license=('AGPL-3.0-or-later')
 depends=()
-optdepends=('adwaita-cursors: fallback cursors for unprovided cursor roles')
 options=('!strip')
 
 package() {

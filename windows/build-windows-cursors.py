@@ -29,7 +29,7 @@ STATIC = {
     "size-we.cur": "ew-resize",
     "size-nwse.cur": "nwse-resize",
     "size-nesw.cur": "nesw-resize",
-    "up-arrow.cur": "left_ptr",
+    "up-arrow.cur": "up-arrow",
     "pencil.cur": "pencil",
     "zoom-in.cur": "zoom-in",
     "zoom-out.cur": "zoom-out",

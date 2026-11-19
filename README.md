@@ -45,6 +45,9 @@ frames, aliases, and the Windows CUR/ANI output. It produces:
 
 Wayland support depends on the desktop environment and compositor. KDE Plasma
 and other XCursor-compatible environments can select the theme directly.
+ZeroMouse provides aliases for Qt on X11 and for common desktop and browser
+cursor roles. Applications that draw their own cursors can still show their
+own artwork.
 
 ## Build packages on GitHub
 

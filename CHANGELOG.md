@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+- Added cursor names used by Qt and Linux desktops, with dedicated artwork for
+  grab, grabbing, copy, link, context menu, vertical text, and alternate select.
+- Removed the explicit Adwaita fallback and packaged a transparent cursor for
+  applications that ask to hide the pointer.
 - Improved question mark contrast, resize arrow geometry, and rocket exhaust.
 - Matched Windows cursor hotspots to the shared artwork.
 - Limited the portable Linux archive to theme files, previews, and documentation.

@@ -163,6 +163,52 @@ def draw_rocket(im, phase=0):
     offset=round(lift*s)
     im.alpha_composite(layer.crop((0,offset,im.width,im.height)),(0,0))
 
+def draw_extra(im, kind):
+    s = im.width / 64
+    d = ImageDraw.Draw(im)
+    if kind == "up-arrow":
+        scaled_poly(d, [(32,5),(51,28),(39,28),(39,56),(25,56),(25,28),(13,28)],
+                    GREEN, s, DARK, 3)
+    elif kind == "grab":
+        palm = [(10,34),(16,31),(23,37),(23,12),(27,8),(31,12),(31,25),
+                (32,8),(36,5),(40,9),(40,25),(42,12),(46,10),(50,14),
+                (49,29),(51,20),(55,18),(59,22),(56,44),(46,58),
+                (26,58),(20,52)]
+        scaled_poly(d, palm, GREEN, s, DARK, 2.8)
+    elif kind == "grabbing":
+        fist = [(8,35),(16,27),(20,20),(26,18),(32,20),(36,16),
+                (43,18),(46,22),(52,21),(57,26),(57,40),(48,55),
+                (23,55),(14,46)]
+        scaled_poly(d, fist, GREEN, s, DARK, 2.8)
+        d.line([(20*s,35*s),(29*s,28*s),(40*s,33*s),(49*s,30*s)],
+               fill=DARK, width=max(1, round(2.8*s)), joint="curve")
+    elif kind == "vertical-text":
+        draw_text(im)
+        # Shift the original I-beam hotspot to the center after rotation.
+        rotated = im.transpose(Image.Transpose.ROTATE_90)
+        im.paste((0,0,0,0), (0,0,im.width,im.height))
+        im.paste(rotated, (0,-round(18*s)))
+    else:
+        draw_pointer(im)
+        d.rounded_rectangle((34*s,34*s,61*s,61*s), radius=5*s,
+                            fill=DARK, outline=GREEN, width=max(1, round(2*s)))
+        if kind == "copy":
+            marks = [[(40,47),(55,47)],[(47.5,40),(47.5,55)]]
+        elif kind == "context-menu":
+            marks = [[(41,y),(54,y)] for y in (41,47,53)]
+        else:
+            marks = [[(41,54),(54,41)],[(44,41),(54,41),(54,51)]]
+        for mark in marks:
+            d.line([(x*s,y*s) for x,y in mark], fill=YELLOW,
+                   width=max(1, round(3*s)), joint="curve")
+
+
+EXTRA_ARTWORK = {
+    "up-arrow", "grab", "grabbing", "vertical-text", "copy", "link",
+    "context-menu", "blank",
+}
+
+
 def render(kind, size, phase=0):
     scaled_size=size*SUPERSAMPLE
     im=Image.new("RGBA",(scaled_size,scaled_size),(0,0,0,0))
@@ -171,6 +217,7 @@ def render(kind, size, phase=0):
     elif kind in ("move","ew-resize","ns-resize","nwse-resize","nesw-resize","crosshair","not-allowed","help","zoom-in","zoom-out","pencil"): draw_special(im,kind)
     elif kind=="watch": draw_hourglass(im,phase)
     elif kind=="progress": draw_rocket(im,phase)
+    elif kind in EXTRA_ARTWORK - {"blank"}: draw_extra(im,kind)
     # Resample in premultiplied-alpha space for smooth edges with no dark halos.
     return im.convert("RGBa").resize((size,size),Image.Resampling.LANCZOS).convert("RGBA")
 
@@ -245,6 +292,53 @@ static={"left_ptr": ("left_ptr",lambda n:(round(n*8/64),round(n*4/64))),
         "zoom-in": ("zoom-in",lambda n:(round(n*25/64),round(n*23/64))),
         "zoom-out": ("zoom-out",lambda n:(round(n*25/64),round(n*23/64))),
         "pencil": ("pencil",lambda n:(round(n*11/64),round(n*56/64)))}
+# Qt, Wayland and historical X11 names that are still requested by applications.
+aliases.update({
+    "left_arrow": "left_ptr", "up_arrow": "up-arrow", "all-resize": "move",
+    "bd_double_arrow": "nesw-resize", "fd_double_arrow": "nwse-resize",
+    "size_bdiag": "nesw-resize", "size-bdiag": "nesw-resize",
+    "size_fdiag": "nwse-resize", "size-fdiag": "nwse-resize",
+    "cross_reverse": "crosshair", "wayland_cursor": "left_ptr",
+    "dnd-ask": "help", "dnd-copy": "copy", "dnd-link": "link",
+    "alias": "link", "openhand": "grab", "closedhand": "grabbing",
+    "none": "blank", "pointer-move": "move", "dot_box_mask": "crosshair",
+    "clock": "watch", "double_arrow": "ns-resize", "exchange": "move",
+    "sizing": "move", "iron_cross": "crosshair", "draft_large": "left_ptr",
+    "draft_small": "left_ptr", "sb_up_arrow": "up-arrow",
+    "sb_down_arrow": "ns-resize", "sb_left_arrow": "ew-resize",
+    "sb_right_arrow": "ew-resize",
+    "0426c94ea35c87780ff01dc239897213": "watch",
+    "028006030e0e7ebffc7f7070c0600140": "ew-resize",
+    "50585d75b494802d0151028115016902": "nesw-resize",
+    "fcf1c3c7cd4491d801f1e1c78f100000": "nesw-resize",
+    "38c5dff7c7b8962045400281044508d2": "nwse-resize",
+    "c7088f0f3e6c8088236ef8e1e3e70000": "nwse-resize",
+    "2870a09082c103050810ffdffffe0204": "ns-resize",
+    "c07385c7190e701020ff7ffffd08103c": "ns-resize",
+    "043a9f68147c53184671403ffa811cc5": "ew-resize",
+    "14fef782d02440884392942c11205230": "ew-resize",
+    "e29285e634086352946a0e7090d73106": "hand",
+    "03b6e0fcb3499374a867c041f52298f0": "not-allowed",
+    "5c6cd98b3f3ebcb1f9c7f1c204630408": "help",
+    "d9ce0ab605698f320427677b458ad60b": "help",
+    "00000000000000020006000e7e9ffc3f": "progress",
+    "08e8e1c95fe2fc01f976f1e063a24ccd": "progress",
+    "00008160000006810000408080010102": "ns-resize",
+    "5aca4d189052212118709018842178c0": "grab",
+    "9d800788f1b08800ae810202380a0822": "grab",
+    "208530c400c041818281048008011002": "grabbing",
+})
+for name in EXTRA_ARTWORK:
+    aliases[name] = name
+    if name == "up-arrow":
+        hotspot = lambda n: (n // 2, round(n * 5 / 64))
+    elif name in {"copy", "link", "context-menu"}:
+        hotspot = static["left_ptr"][1]
+    else:
+        hotspot = lambda n: (n // 2, n // 2)
+    static[name] = (name, hotspot)
+
+
 def build_theme():
     OUT.mkdir(parents=True,exist_ok=True)
     for name,(shape,hot) in static.items():

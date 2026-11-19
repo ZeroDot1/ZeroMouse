@@ -14,6 +14,8 @@ ARTWORK = {
     "left_ptr", "hand", "text", "move", "ew-resize", "ns-resize",
     "nwse-resize", "nesw-resize", "crosshair", "not-allowed", "help",
     "zoom-in", "zoom-out", "pencil", "watch", "progress",
+    "up-arrow", "grab", "grabbing", "vertical-text", "copy", "link",
+    "context-menu", "blank",
 }
 REQUIRED_ROLES = {
     "default", "left_ptr", "pointer", "hand", "text", "xterm", "watch",
@@ -23,6 +25,8 @@ REQUIRED_ROLES = {
     "link", "grab", "grabbing", "dnd-move", "dnd-no-drop", "cell",
     "color-picker", "size_hor", "size_ver", "size_fdiag", "size_bdiag",
     "top_left_corner", "bottom_right_corner", "wayland-cursor",
+    "up_arrow", "left_arrow", "blank", "dnd-ask", "bd_double_arrow",
+    "fd_double_arrow", "all-resize", "cross_reverse", "wayland_cursor",
 }
 
 def fail(message):
@@ -56,8 +60,8 @@ def validate_file(path):
         if hot_x >= width or hot_y >= height or end > len(data):
             fail(f"{path.name}: invalid hotspot or truncated pixels in image chunk {index}")
         pixels = memoryview(data)[position + 36:end]
-        if not any(pixels[3::4]):
-            fail(f"{path.name}: image chunk {index} is fully transparent")
+        if any(pixels[3::4]) == (path.name == "blank"):
+            fail(f"{path.name}: unexpected image transparency in chunk {index}")
         actual_sizes.append(subtype)
         chunks.append((position, end, delay))
 
