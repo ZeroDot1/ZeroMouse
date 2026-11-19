@@ -1,7 +1,7 @@
 
 # Changelog
 
-## Unreleased
+## 1.0.6
 
 - Added cursor names used by Qt and Linux desktops, with dedicated artwork for
   grab, grabbing, copy, link, context menu, vertical text, and alternate select.

@@ -194,10 +194,30 @@ jobs:
       - name: Create SHA-256 manifest
         run: |
           set -euo pipefail
+          shopt -s nullglob
           version="$(tr -d '\r\n' < VERSION)"
-          test -s "dist/ZeroMouse-Setup-${version}.exe"
-          test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 5
-          (cd dist && sha256sum * > SHA256SUMS)
+          cd dist
+          arch=(zeromouse-cursor-theme-"${version}"-*-any.pkg.tar.zst)
+          rpm=(zeromouse-cursor-theme-"${version}"-*.noarch.rpm)
+          if (( ${#arch[@]} != 1 || ${#rpm[@]} != 1 )); then
+            echo "Expected one Arch package and one RPM for version $version." >&2
+            exit 1
+          fi
+          packages=(
+            "${arch[0]}"
+            "${rpm[0]}"
+            "zeromouse-cursor-theme_${version}_all.deb"
+            "zeromouse-cursor-theme-${version}-linux-any.tar.gz"
+            "ZeroMouse-Setup-${version}.exe"
+          )
+          for package in "${packages[@]}"; do
+            if [[ ! -s "$package" ]]; then
+              echo "Missing or empty package: $package" >&2
+              exit 1
+            fi
+          done
+          test "$(find . -maxdepth 1 -type f | wc -l)" -eq "${#packages[@]}"
+          sha256sum -- "${packages[@]}" > SHA256SUMS
       - uses: actions/upload-artifact@v7
         with:
           name: release-packages
@@ -224,6 +244,7 @@ jobs:
           set -euo pipefail
           version="$(tr -d '\r\n' < VERSION)"
           tag="v${version}"
+          (cd dist && sha256sum --check --strict SHA256SUMS)
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Release $tag already exists; refusing to replace it." >&2
             exit 1
