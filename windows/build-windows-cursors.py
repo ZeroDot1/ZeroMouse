@@ -37,12 +37,11 @@ STATIC = {
 
 
 def hotspot(kind: str, size: int) -> tuple[int, int]:
-    anchors = {
-        "left_ptr": (8, 4), "hand": (32, 5), "text": (14, 32),
-        "pencil": (11, 56), "zoom-in": (25, 23), "zoom-out": (25, 23),
-    }
-    x, y = anchors.get(kind, (32, 32))
-    return round(size * x / 64), round(size * y / 64)
+    if kind == "progress":
+        return size // 2, round(size * 5 / 64)
+    if kind == "watch":
+        return size // 2, size // 2
+    return build.static[kind][1](size)
 
 
 def _dib_image(image) -> bytes:

@@ -1,6 +1,13 @@
 
 # Changelog
 
+## Unreleased
+
+- Improved question mark contrast, resize arrow geometry, and rocket exhaust.
+- Matched Windows cursor hotspots to the shared artwork.
+- Limited the portable Linux archive to theme files, previews, and documentation.
+- Made the Arch helper scripts check the built package and remove only ZeroMouse.
+
 ## 1.0.5
 
 - Added multi-resolution Windows cursor files generated from the same artwork

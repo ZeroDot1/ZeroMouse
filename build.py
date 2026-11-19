@@ -2,6 +2,7 @@
 """Build ZeroMouse XCursor binaries from resolution-independent Pillow drawings."""
 from pathlib import Path
 import struct
+from math import hypot
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent
@@ -73,16 +74,19 @@ def draw_special(im, kind):
         d.line([(a[0]*s,a[1]*s),(b[0]*s,b[1]*s)],fill=DARK,width=max(1,round(7*s)))
         d.line([(a[0]*s,a[1]*s),(b[0]*s,b[1]*s)],fill=GREEN,width=max(1,round(3*s)))
     def head(p,dr):
-        x,y=p; dx,dy=dr; px,py=-dy,dx
+        x, y = p
+        length = hypot(*dr)
+        dx, dy = (component / length for component in dr)
+        px, py = -dy, dx
         scaled_poly(d,[(x+dx*9,y+dy*9),(x-dx*2+px*5,y-dy*2+py*5),(x-dx*2-px*5,y-dy*2-py*5)],YELLOW,s,DARK,1.5)
     if kind=="move":
         line((32,12),(32,52)); line((12,32),(52,32))
-        for p,dr in [((32,8),(0,-1)),((32,56),(0,1)),((8,32),(-1,0)),((56,32),(1,0))]: head(p,dr)
+        for p,dr in [((32,11),(0,-1)),((32,53),(0,1)),((11,32),(-1,0)),((53,32),(1,0))]: head(p,dr)
     elif kind in ("ew-resize","ns-resize"):
         a,b=((12,32),(52,32)) if kind=="ew-resize" else ((32,12),(32,52))
         dr=(-1,0) if kind=="ew-resize" else (0,-1)
         end=(1,0) if kind=="ew-resize" else (0,1)
-        line(a,b); head((a[0]+dr[0]*4,a[1]+dr[1]*4),dr); head((b[0]+end[0]*4,b[1]+end[1]*4),end)
+        line(a,b); head((a[0]+dr[0],a[1]+dr[1]),dr); head((b[0]+end[0],b[1]+end[1]),end)
     elif kind in ("nwse-resize","nesw-resize"):
         a,b=((12,12),(52,52)) if kind=="nwse-resize" else ((52,12),(12,52))
         da,db=((-1,-1),(1,1)) if kind=="nwse-resize" else ((1,-1),(-1,1))
@@ -96,18 +100,18 @@ def draw_special(im, kind):
         d.line([(19*s,45*s),(45*s,19*s)],fill=DARK,width=max(1,round(8*s)))
         d.line([(19*s,45*s),(45*s,19*s)],fill=YELLOW,width=max(1,round(4*s)))
     elif kind=="help":
-        d.ellipse((9*s,9*s,55*s,55*s),outline=DARK,width=max(1,round(7*s)))
-        d.ellipse((9*s,9*s,55*s,55*s),outline=GREEN,width=max(1,round(3*s)))
-        question=[(24,22)]
-        question+=cubic((24,22),(24,17),(28,14),(33,14))
-        question+=cubic((33,14),(38,14),(41,18),(41,23))
-        question+=cubic((41,23),(41,28),(37,30),(34,33))
-        question+=cubic((34,33),(32,35),(31,37),(31,40))
-        q=[(round(x*s),round(y*s)) for x,y in question]
-        d.line(q,fill=DARK,width=max(2,round(7*s)),joint="curve")
-        d.line(q,fill=YELLOW,width=max(1,round(3*s)),joint="curve")
-        d.ellipse((28*s,44*s,35*s,51*s),fill=DARK)
-        d.ellipse((29.5*s,45.5*s,33.5*s,49.5*s),fill=YELLOW)
+        # A solid dark field holds the glyph together over any background.
+        d.ellipse((7*s,7*s,57*s,57*s), fill=DARK,
+                  outline=GREEN, width=max(1, round(3*s)))
+        question = [(23,24)]
+        question += cubic((23,24),(23,13),(42,13),(42,24))
+        question += cubic((42,24),(42,31),(32,31),(32,37))
+        width = max(1, round(5*s))
+        d.line([(round(x*s), round(y*s)) for x,y in question],
+               fill=YELLOW, width=width, joint="curve")
+        for x, y in (question[0], question[-1]):
+            d.ellipse(((x-2.5)*s,(y-2.5)*s,(x+2.5)*s,(y+2.5)*s), fill=YELLOW)
+        d.ellipse((29*s,43*s,35*s,49*s), fill=YELLOW)
     elif kind in ("zoom-in","zoom-out"):
         d.ellipse((8*s,6*s,42*s,40*s),outline=DARK,width=max(1,round(8*s)))
         d.ellipse((8*s,6*s,42*s,40*s),outline=GREEN,width=max(1,round(4*s)))
@@ -127,13 +131,18 @@ def draw_hourglass(im, phase=0):
     scaled_poly(d,top,GREEN,s,DARK,2.5)
     d.line([(17*s,12*s),(47*s,12*s)],fill=YELLOW,width=max(1,round(2*s)))
     d.line([(17*s,50*s),(47*s,50*s)],fill=YELLOW,width=max(1,round(2*s)))
-    # Sand pile in upper chamber drains to the lower chamber.
+    scaled_poly(d, [(19,15),(45,15),(32,29)], DARK, s)
+    scaled_poly(d, [(32,34),(45,48),(19,48)], DARK, s)
+    # Sand drains from the upper chamber into the lower chamber.
     frac=(phase%6)/5
-    upper_h=max(1,round(13*(1-frac)))
-    d.polygon([(20*s,14*s),(44*s,14*s),(32*s,(14+upper_h)*s)],fill=YELLOW)
+    upper_h=11*(1-frac)
+    if upper_h > 0:
+        half_width = upper_h * 0.8
+        d.polygon([((32-half_width)*s,(28-upper_h)*s),
+                   ((32+half_width)*s,(28-upper_h)*s),(32*s,28*s)],fill=YELLOW)
     d.line([(32*s,29*s),(32*s,34*s)],fill=YELLOW,width=max(1,round(2*s)))
     lower_h=max(1,round(2+10*frac))
-    d.polygon([(21*s,48*s),(43*s,48*s),(32*s,(48-lower_h)*s)],fill=YELLOW)
+    d.polygon([(22*s,47*s),(42*s,47*s),(32*s,(47-lower_h)*s)],fill=YELLOW)
 
 def draw_rocket(im, phase=0):
     s=im.width/64
@@ -142,7 +151,7 @@ def draw_rocket(im, phase=0):
     # lift-off motion instead of a static rocket with a blinking flame.
     phase=phase%4
     lift=(0,1,2.25,3.5)[phase]
-    length=(9,13,17,21)[phase]
+    length=(8,11,14,17)[phase]
     d.polygon([(27*s,42*s),(37*s,42*s),(32*s,(42+length)*s)],fill=GREEN)
     d.polygon([(30*s,43*s),(34*s,43*s),(32*s,(43+max(3,length-4))*s)],fill=YELLOW)
     # Faceted nose and swept fins keep the launch symbol technical and spare.

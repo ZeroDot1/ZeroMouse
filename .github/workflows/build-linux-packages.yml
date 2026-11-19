@@ -51,7 +51,9 @@ jobs:
               useradd --no-create-home --uid "$HOST_UID" --gid "$HOST_GID" builder
               install -d -o "$HOST_UID" -g "$HOST_GID" /tmp/buildhome /work/dist
               runuser -u builder -- bash -c "cd /work && HOME=/tmp/buildhome makepkg --noconfirm --cleanbuild --force"
-              cp /work/zeromouse-cursor-theme-*-any.pkg.tar.zst /work/dist/
+              package_path="$(runuser -u builder -- env HOME=/tmp/buildhome makepkg --packagelist)"
+              test -f "$package_path"
+              cp -- "$package_path" /work/dist/
             '
       - uses: actions/upload-artifact@v7
         with:
@@ -183,13 +185,17 @@ jobs:
     needs: [build-arch, build-debian, build-fedora, build-universal, build-windows]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v7
         with:
+          pattern: package-*
           path: dist
           merge-multiple: true
       - name: Create SHA-256 manifest
         run: |
           set -euo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          test -s "dist/ZeroMouse-Setup-${version}.exe"
           test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 5
           (cd dist && sha256sum * > SHA256SUMS)
       - uses: actions/upload-artifact@v7

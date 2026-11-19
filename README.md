@@ -82,8 +82,8 @@ Neon Launch**, and choose a size. Uninstall with `./uninstall.sh`.
 Download and run `ZeroMouse-Setup-<version>.exe` from the GitHub Release. The
 installer works for the current user and does not require administrator rights.
 It applies the pointer, text, hand, help, move, resize, crosshair, forbidden,
-pen, and zoom cursors; the animated hourglass is used while Windows is busy and
-the animated rocket is used while an application starts. The uninstaller
+and pen cursors. Zoom cursors are included for manual use. Windows uses the
+animated hourglass when busy and the animated rocket when an application starts. The uninstaller
 restores the cursor settings that were active before installation.
 
 Windows `.cur` and `.ani` files store dimensions in one-byte fields, where the
